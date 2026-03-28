@@ -43,6 +43,14 @@ El algoritmo no hace un simple cruce de "montos iguales". Está programado para 
 
 ---
 
+## 📋 Reporte de Salida
+
+El resultado es un Excel semaforizado donde cada fila indica exactamente qué acción debe tomar el auditor:
+
+![Reporte semaforizado de AUDIBOT](assets/output.png)
+
+---
+
 ## 🛠️ Arquitectura y Tecnologías
 
 El proyecto fue construido con un enfoque modular y escalable, permitiendo agregar nuevas lógicas de facturación o puntos de venta (hoteles) simplemente editando un archivo JSON de configuración.

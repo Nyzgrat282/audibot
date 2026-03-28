@@ -1,85 +1,85 @@
-# 🏨 Sistema ETL de Auditoría Financiera Hotelera: Cloudbeds ↔ SiFactura
+# 🏨 Hotel Financial Audit ETL System: Cloudbeds ↔ SiFactura
 
-Un motor de procesamiento de datos y conciliación automática diseñado para resolver el cuello de botella más crítico de la auditoría nocturna: cruzar cientos de transacciones diarias entre un PMS (Cloudbeds) y un sistema de facturación fiscal (SiFactura/AFIP) eliminando el error humano.
+A data processing and automatic reconciliation engine designed to solve the most critical bottleneck in night auditing: cross-referencing hundreds of daily transactions between a PMS (Cloudbeds) and a fiscal billing system (SiFactura/AFIP) while eliminating human error.
 
-> **Impacto Comercial:** Transforma una tarea manual de 45+ minutos propensa a errores en un proceso infalible que se ejecuta en **0.30 segundos**.
-
----
-
-## 🚀 El Problema vs. La Solución
-
-**El Problema:**
-La conciliación manual exige cruzar múltiples bases de datos desestructuradas a la madrugada. Los sistemas no se hablan entre sí, y los humanos deben detectar pagos parciales, diferencias por tipo de cambio, retenciones fiscales y errores de tipeo, línea por línea.
-
-**La Solución (AUDIBOT):**
-Un sistema desarrollado en Python que ingesta los reportes crudos, normaliza los datos y aplica un algoritmo de *matching* complejo. Genera un reporte final en Excel, semaforizado por colores, destacando exactamente dónde requiere intervención el auditor.
+> **Commercial Impact:** Transforms a manual 45+ minute error-prone task into a flawless process that runs in **0.30 seconds**.
 
 ---
 
-## 📊 Métricas de Rendimiento y Volumen
+## 🚀 The Problem vs. The Solution
 
-El sistema está optimizado para entornos de alta exigencia operativa, testeado en producción en un hotel céntrico de Buenos Aires:
+**The Problem:**
+Manual reconciliation requires cross-referencing multiple unstructured databases in the middle of the night. The systems don't communicate with each other, and humans must detect partial payments, exchange rate differences, tax withholdings, and typos — line by line.
 
-*   **Volumen de Datos:** Procesa entre **90 y 170 registros diarios complejos** (30-70 imputaciones vs. 60-100 facturas fiscales).
-*   **Velocidad de Ejecución (Producción):** **0.30 segundos** en el equipo de recepción.
-*   **Eficiencia Multiplataforma:** Arquitectura de bajo consumo de recursos (0.44s en entornos Linux portátiles, 0.99s en Windows).
-
----
-
-## ⚙️ Complejidad Operativa Resuelta
-
-El algoritmo no hace un simple cruce de "montos iguales". Está programado para entender las **reglas de negocio** reales de la industria hotelera y fiscal:
-
-*   **Pagos Parciales y Complejos:** Detecta *N* transacciones de Cloudbeds que sumadas equivalen a una única factura en SiFactura.
-*   **Inteligencia Fiscal:** Identifica y concilia retenciones impositivas de Argentina (IIBB, Ganancias, SUSS, IVA) y diferencia lógicas de matching según el tipo de comprobante (Facturas A, B, T, X).
-*   **Anulaciones LIFO:** Detecta operaciones de pago y anulación ocurridas en la misma jornada para excluirlas del reporte de discrepancias.
-*   **Conversión Multimoneda:** Función `GREEN_CARD` integrada para la conversión automática de pagos en USD a ARS según el tipo de cambio dinámico ingresado.
+**The Solution (AUDIBOT):**
+A Python-based system that ingests raw reports, normalizes the data, and applies a complex matching algorithm. It generates a final color-coded Excel report highlighting exactly where the auditor needs to intervene.
 
 ---
 
-## 🖥️ Interfaz
+## 📊 Performance & Volume Metrics
 
-![GUI de AUDIBOT](assets/gui.png)
+The system is optimized for high-demand operational environments, tested in production at a downtown Buenos Aires hotel:
 
----
-
-## 📋 Reporte de Salida
-
-El resultado es un Excel semaforizado donde cada fila indica exactamente qué acción debe tomar el auditor:
-
-![Reporte semaforizado de AUDIBOT](assets/output.png)
+*   **Data Volume:** Processes between **90 and 170 complex daily records** (30–70 PMS entries vs. 60–100 fiscal invoices).
+*   **Production Execution Speed:** **0.30 seconds** on the front desk machine.
+*   **Cross-Platform Efficiency:** Low-resource architecture (0.44s on portable Linux environments, 0.99s on Windows).
 
 ---
 
-## 🛠️ Arquitectura y Tecnologías
+## ⚙️ Operational Complexity Resolved
 
-El proyecto fue construido con un enfoque modular y escalable, permitiendo agregar nuevas lógicas de facturación o puntos de venta (hoteles) simplemente editando un archivo JSON de configuración.
+The algorithm does not perform a simple "equal amounts" match. It is programmed to understand the real **business rules** of the hotel and fiscal industry:
 
-*   **Lenguaje Base:** Python 3.12+
-*   **Interfaz Gráfica (GUI):** CustomTkinter (Entry point amigable para el usuario final sin conocimientos de consola).
-*   **Procesamiento de Datos:** Lógica custom de parseo (`core/parsers.py`) y algoritmos de coincidencia (`core/matchers.py`).
-*   **Observabilidad:** Sistema de *Logging* encapsulado con generación automática de metadatos y hashes SHA256 por cada ejecución para trazabilidad y soporte técnico.
-*   **Distribución:** Ejecutables compilados nativamente vía PyInstaller para Linux (`.sh`) y Windows (`.bat`).
+*   **Partial & Complex Payments:** Detects *N* Cloudbeds transactions that, when summed, equal a single SiFactura invoice.
+*   **Fiscal Intelligence:** Identifies and reconciles Argentine tax withholdings (IIBB, Ganancias, SUSS, VAT) and differentiates matching logic based on invoice type (Invoices A, B, T, X).
+*   **LIFO Voids:** Detects payment and void operations occurring on the same business day to exclude them from the discrepancy report.
+*   **Multi-Currency Conversion:** Integrated `GREEN_CARD` function for automatic USD to ARS conversion based on the dynamic exchange rate entered by the user.
 
 ---
 
-## 📁 Archivos de Muestra
+## 🖥️ Interface
 
-La carpeta [`samples/`](samples/) contiene datos ficticios que ilustran exactamente qué entra y qué sale del sistema:
+![AUDIBOT GUI](assets/gui.png)
 
-| Archivo | Descripción |
+---
+
+## 📋 Output Report
+
+The result is a color-coded Excel where each row indicates exactly what action the auditor needs to take:
+
+![AUDIBOT color-coded report](assets/output.png)
+
+---
+
+## 🛠️ Architecture & Technologies
+
+The project was built with a modular and scalable approach, allowing new billing logic or points of sale (hotels) to be added simply by editing a JSON configuration file.
+
+*   **Core Language:** Python 3.12+
+*   **GUI:** CustomTkinter (user-friendly entry point requiring no console knowledge).
+*   **Data Processing:** Custom parsing logic (`core/parsers.py`) and matching algorithms (`core/matchers.py`).
+*   **Observability:** Encapsulated logging system with automatic metadata generation and SHA256 hashes per execution for traceability and technical support.
+*   **Distribution:** Natively compiled executables via PyInstaller for Linux (`.sh`) and Windows (`.bat`).
+
+---
+
+## 📁 Sample Files
+
+The [`samples/`](samples/) folder contains fictional data illustrating exactly what goes in and out of the system:
+
+| File | Description |
 |---|---|
-| `input_cloudbeds_mock.xlsx` | Exportación simulada del PMS (pagos, reservas, habitaciones) |
-| `input_sifactura_mock.xlsx` | Listado de facturas fiscales simulado (AFIP/SiFactura) |
-| `output_auditoria_mock.xlsx` | Reporte final generado por AUDIBOT, semaforizado por colores |
+| `input_cloudbeds_mock.xlsx` | Simulated PMS export (payments, reservations, rooms) |
+| `input_sifactura_mock.xlsx` | Simulated fiscal invoice list (AFIP/SiFactura) |
+| `output_auditoria_mock.xlsx` | Final report generated by AUDIBOT, color-coded |
 
-El output incluye ejemplos de todos los escenarios que el algoritmo resuelve: matches exactos, pagos divididos en múltiples transacciones, conversión USD→ARS vía GREEN_CARD, anulaciones LIFO y discrepancias pendientes de revisión.
+The output includes examples of every scenario the algorithm handles: exact matches, payments split across multiple transactions, USD→ARS conversion via GREEN_CARD, LIFO voids, and discrepancies pending review.
 
 ---
 
-## 📬 Contacto
+## 📬 Contact
 
-¿Tenés un flujo operativo que querés automatizar? Puedo desarrollar una solución similar para tu negocio.
+Do you have an operational workflow you want to automate? I can develop a similar solution for your business.
 
 *   **LinkedIn:** [Sebastián González](https://www.linkedin.com/in/sebasti%C3%A1n-gonz%C3%A1lez-571a18195/)
 *   **Email:** [sebag2298@gmail.com](mailto:sebag2298@gmail.com)

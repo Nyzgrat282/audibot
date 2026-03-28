@@ -37,6 +37,12 @@ El algoritmo no hace un simple cruce de "montos iguales". Está programado para 
 
 ---
 
+## 🖥️ Interfaz
+
+![GUI de AUDIBOT](assets/gui.png)
+
+---
+
 ## 🛠️ Arquitectura y Tecnologías
 
 El proyecto fue construido con un enfoque modular y escalable, permitiendo agregar nuevas lógicas de facturación o puntos de venta (hoteles) simplemente editando un archivo JSON de configuración.

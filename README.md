@@ -55,6 +55,20 @@ El proyecto fue construido con un enfoque modular y escalable, permitiendo agreg
 
 ---
 
+## 📁 Archivos de Muestra
+
+La carpeta [`samples/`](samples/) contiene datos ficticios que ilustran exactamente qué entra y qué sale del sistema:
+
+| Archivo | Descripción |
+|---|---|
+| `input_cloudbeds_mock.xlsx` | Exportación simulada del PMS (pagos, reservas, habitaciones) |
+| `input_sifactura_mock.xlsx` | Listado de facturas fiscales simulado (AFIP/SiFactura) |
+| `output_auditoria_mock.xlsx` | Reporte final generado por AUDIBOT, semaforizado por colores |
+
+El output incluye ejemplos de todos los escenarios que el algoritmo resuelve: matches exactos, pagos divididos en múltiples transacciones, conversión USD→ARS vía GREEN_CARD, anulaciones LIFO y discrepancias pendientes de revisión.
+
+---
+
 *Nota: El código fuente de este motor se encuentra en un repositorio privado ya que actualmente forma parte de la arquitectura core del proyecto Nox PMS. Este repositorio funciona como un showcase del caso de éxito y las métricas de rendimiento.*
 
 ---

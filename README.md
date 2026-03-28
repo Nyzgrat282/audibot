@@ -69,10 +69,6 @@ El output incluye ejemplos de todos los escenarios que el algoritmo resuelve: ma
 
 ---
 
-*Nota: El código fuente de este motor se encuentra en un repositorio privado ya que actualmente forma parte de la arquitectura core del proyecto Nox PMS. Este repositorio funciona como un showcase del caso de éxito y las métricas de rendimiento.*
-
----
-
 ## 📬 Contacto
 
 ¿Tenés un flujo operativo que querés automatizar? Puedo desarrollar una solución similar para tu negocio.

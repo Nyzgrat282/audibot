@@ -1,5 +1,7 @@
 # 🏨 Hotel Financial Audit ETL System: Cloudbeds ↔ SiFactura
 
+![Tests](https://img.shields.io/badge/tests-84%20passed-brightgreen) ![Python](https://img.shields.io/badge/python-3.12%2B-blue) ![Coverage](https://img.shields.io/badge/coverage-core%20engine-brightgreen)
+
 A data processing and automatic reconciliation engine designed to solve the most critical bottleneck in night auditing: cross-referencing hundreds of daily transactions between a PMS (Cloudbeds) and a fiscal billing system (SiFactura/AFIP) while eliminating human error.
 
 > **Commercial Impact:** Transforms a manual 45+ minute error-prone task into a flawless process that runs in **0.30 seconds**.
@@ -58,8 +60,26 @@ The project was built with a modular and scalable approach, allowing new billing
 *   **Core Language:** Python 3.12+
 *   **GUI:** CustomTkinter (user-friendly entry point requiring no console knowledge).
 *   **Data Processing:** Custom parsing logic (`core/parsers.py`) and matching algorithms (`core/matchers.py`).
+*   **Adapter Layer:** Pluggable data source architecture (`adapters/`) — currently reads Excel exports, designed for direct API integration.
 *   **Observability:** Encapsulated logging system with automatic metadata generation and SHA256 hashes per execution for traceability and technical support.
 *   **Distribution:** Natively compiled executables via PyInstaller for Linux (`.sh`) and Windows (`.bat`).
+
+---
+
+## ✅ Test Suite
+
+The core matching engine is fully covered by an automated test suite (84 tests, 100% passing):
+
+| Module | Tests | What's covered |
+|---|---|---|
+| `core/utils.py` | 28 | Name normalization, fuzzy similarity, TC calculation, amount parsing |
+| `core/parsers.py` | 28 | ARS extraction from 9 note formats, guardrail, payment method mapping |
+| `core/matchers.py` | 28 | Duplicate detection, anti-crossmatch, business exclusions (Mercado Pago, voids) |
+
+Key scenarios validated:
+- **Anti-crossmatch:** Guests with different names but matching amounts are never incorrectly linked
+- **dtype safety:** Handles CloudBeds dtype inconsistencies (string reservation numbers, etc.) without crashing
+- **Fiscal guardrail:** Exchange rate values are never misidentified as ARS amounts
 
 ---
 

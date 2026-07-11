@@ -1,10 +1,12 @@
-# 🏨 Hotel Financial Audit ETL System: Cloudbeds ↔ SiFactura
+# 🏨 AUDIBOT — Hotel Financial Audit ETL: Cloudbeds ↔ SiFactura
 
-![Tests](https://img.shields.io/badge/tests-84%20passed-brightgreen) ![Python](https://img.shields.io/badge/python-3.12%2B-blue) ![Coverage](https://img.shields.io/badge/coverage-core%20engine-brightgreen)
+![Tests](https://img.shields.io/badge/tests-455%20passed-brightgreen) ![Python](https://img.shields.io/badge/python-3.12%2B-blue) ![Version](https://img.shields.io/badge/version-4.10-blue) ![Coverage](https://img.shields.io/badge/coverage-core%20engine-brightgreen)
 
-A data processing and automatic reconciliation engine designed to solve the most critical bottleneck in night auditing: cross-referencing hundreds of daily transactions between a PMS (Cloudbeds) and a fiscal billing system (SiFactura/AFIP) while eliminating human error.
+A data-processing and automatic reconciliation engine that solves the most critical bottleneck in night auditing: cross-referencing hundreds of daily transactions between a PMS (**Cloudbeds**) and a fiscal billing system (**SiFactura/AFIP**), while eliminating human error.
 
-> **Commercial Impact:** Transforms a manual 45+ minute error-prone task into a flawless process that runs in **0.30 seconds**.
+> **In production at Up Hoteles (Buenos Aires)** — running nightly across three properties, used by real auditors.
+
+> **Commercial Impact:** transforms a manual 45+ minute error-prone task into a flawless process that runs in **~0.40 seconds** on average.
 
 ---
 
@@ -14,40 +16,62 @@ A data processing and automatic reconciliation engine designed to solve the most
 Manual reconciliation requires cross-referencing multiple unstructured databases in the middle of the night. The systems don't communicate with each other, and humans must detect partial payments, exchange rate differences, tax withholdings, and typos — line by line.
 
 **The Solution (AUDIBOT):**
-A Python-based system that ingests raw reports, normalizes the data, and applies a complex matching algorithm. It generates a final color-coded Excel report highlighting exactly where the auditor needs to intervene.
+A Python desktop app that ingests the raw reports, normalizes the data, and applies a complex matching algorithm. It generates a final color-coded Excel report highlighting exactly where the auditor needs to intervene — nothing else.
+
+| Color | Meaning |
+|---|---|
+| 🟢 Green | Correct match |
+| 🟡 Yellow | Review / fix (payment-method change, re-invoice, etc.) |
+| 🔴 Red | No match / detected error |
+| ⚪ Gray | Intentionally excluded (voids with credit note, pending Mercado Pago, current account) |
 
 ---
 
-## 📊 Performance & Volume Metrics
+## 🆕 What's new since the first pilot (v4.10)
 
-The system is optimized for high-demand operational environments, tested in production at a downtown Buenos Aires hotel:
+The engine grew from 84 to **455 automated tests** and matured from a matching script into a maintained desktop product:
 
-*   **Data Volume:** Processes between **90 and 170 complex daily records** (30–70 PMS entries vs. 60–100 fiscal invoices).
-*   **Production Execution Speed:** **0.30 seconds** on the front desk machine.
-*   **Cross-Platform Efficiency:** Low-resource architecture (0.44s on portable Linux environments, 0.99s on Windows).
+- **5 new automatic detections** (see below) surfaced from real production audits.
+- **Built-in auto-update** — the app checks for new public releases and updates itself, so every property runs the same current version.
+- **Irreversible data anonymization** for support bundles (GDPR / EDPB-aligned) — see *Data Handling* below.
+- **Integrated support flow** — one-click support package delivered to the developer, with graceful offline degradation.
+- **Per-run observability** — every execution leaves a traceable run folder (inputs, logs, SHA256 hashes).
+- **Cross-platform native builds** — Windows `.exe` and Linux binaries via PyInstaller.
 
 ---
 
 ## ⚙️ Operational Complexity Resolved
 
-The algorithm does not perform a simple "equal amounts" match. It is programmed to understand the real **business rules** of the hotel and fiscal industry:
+The algorithm doesn't do a naive "equal amounts" match. It encodes the real **business rules** of the hotel and fiscal industry:
 
-*   **Partial & Complex Payments:** Detects *N* Cloudbeds transactions that, when summed, equal a single SiFactura invoice.
-*   **Fiscal Intelligence:** Identifies and reconciles Argentine tax withholdings (IIBB, Ganancias, SUSS, VAT) and differentiates matching logic based on invoice type (Invoices A, B, T, X).
-*   **LIFO Voids:** Detects payment and void operations occurring on the same business day to exclude them from the discrepancy report.
-*   **Multi-Currency Conversion:** Integrated `GREEN_CARD` function for automatic USD to ARS conversion based on the dynamic exchange rate entered by the user.
+- **Partial & complex payments:** detects *N* Cloudbeds transactions that, summed, equal a single SiFactura invoice.
+- **Fiscal intelligence:** reconciles Argentine tax withholdings (IIBB, Ganancias, SUSS, VAT) and applies differentiated logic per invoice type (A, B, T, X).
+- **LIFO voids:** detects payment + void on the same business day and excludes them from the discrepancy report.
+- **Multi-currency:** `GREEN_CARD` function converts USD → ARS at the day's exchange rate.
+- **Duplicate coupons:** same card charged twice.
+- 🆕 **Invoices with no customer loaded** — flags SiFactura invoices left with an empty client field before fiscal close.
+- 🆕 **Orphan FT/FX invoices of the same guest** — catches a foreign-platform charge invoiced as if it were domestic.
+- 🆕 **Fiscal invoices with no matching Cloudbeds payment** — every invoice in range must have a counterpart.
+- 🆕 **Mercado Pago imputed to the wrong point of sale** — separates the false positive from the real POS problem.
+- 🆕 **USD × exchange-rate ≠ ARS coherence** — a peso invoice that doesn't close against a dollar payment at the day's rate.
 
 ---
 
-## 🖥️ Interface
+## 🔐 Data Handling & Privacy
+
+AUDIBOT runs on **real guest and fiscal data**, so privacy is built in, not bolted on:
+
+- **Irreversible anonymization** (`core/anonimizador.py`): before any support bundle leaves the front-desk machine, guest names, amounts and fiscal identifiers are stripped — **no opt-out**.
+- Backed by an internal **EDPB compliance checklist**, a **data-retention policy**, and a DPA template.
+- Support data that becomes a regression case never reaches the repository un-anonymized.
+
+---
+
+## 🖥️ Interface & Output
 
 ![AUDIBOT GUI](assets/gui.png)
 
----
-
-## 📋 Output Report
-
-The result is a color-coded Excel where each row indicates exactly what action the auditor needs to take:
+The result is a color-coded Excel where each row states exactly what the auditor must do:
 
 ![AUDIBOT color-coded report](assets/output.png)
 
@@ -55,45 +79,46 @@ The result is a color-coded Excel where each row indicates exactly what action t
 
 ## 🛠️ Architecture & Technologies
 
-The project was built with a modular and scalable approach, allowing new billing logic or points of sale (hotels) to be added simply by editing a JSON configuration file.
+Modular, testable, and built to add new billing logic or properties by editing configuration — not code.
 
-*   **Core Language:** Python 3.12+
-*   **GUI:** CustomTkinter (user-friendly entry point requiring no console knowledge).
-*   **Data Processing:** Custom parsing logic (`core/parsers.py`) and matching algorithms (`core/matchers.py`).
-*   **Adapter Layer:** Pluggable data source architecture (`adapters/`) — currently reads Excel exports, designed for direct API integration.
-*   **Observability:** Encapsulated logging system with automatic metadata generation and SHA256 hashes per execution for traceability and technical support.
-*   **Distribution:** Natively compiled executables via PyInstaller for Linux (`.sh`) and Windows (`.bat`).
+- **Core language:** Python 3.12+
+- **GUI:** CustomTkinter (no console knowledge required)
+- **Matching engine:** `core/matchers/` — a dedicated package split into reusable primitives, detectors, a row-by-row pipeline, and block processors.
+- **Parsing:** `core/parsers.py` (amounts, payment methods, DD/MM/YYYY dates) with fiscal guardrails.
+- **Adapter layer:** pluggable data sources (`adapters/`) — currently Excel/HTML exports, designed toward direct API integration.
+- **Auto-update & support:** `gui/updater.py` (release checks), `gui/soporte.py` + `gui/telegram.py` (support bundles).
+- **Observability:** per-run folders under `~/Documents/AUDIBOT/RUNS/` with logs and SHA256 hashes for traceability.
+- **Distribution:** natively compiled executables via PyInstaller (Linux + Windows).
 
 ---
 
 ## ✅ Test Suite
 
-The core matching engine is fully covered by an automated test suite (84 tests, 100% passing):
+**455 passing tests** cover the matching engine end-to-end:
 
-| Module | Tests | What's covered |
-|---|---|---|
-| `core/utils.py` | 28 | Name normalization, fuzzy similarity, TC calculation, amount parsing |
-| `core/parsers.py` | 28 | ARS extraction from 9 note formats, guardrail, payment method mapping |
-| `core/matchers.py` | 28 | Duplicate detection, anti-crossmatch, business exclusions (Mercado Pago, voids) |
+- The matching core (`core/matchers/`): duplicate detection, anti-crossmatch, business exclusions (Mercado Pago, voids).
+- Parsers: ARS extraction across multiple note formats, fiscal guardrail, payment-method mapping.
+- Utilities: name normalization, fuzzy similarity, exchange-rate math, amount parsing.
+- The five new detectors, each with its own regression scenarios.
 
-Key scenarios validated:
-- **Anti-crossmatch:** Guests with different names but matching amounts are never incorrectly linked
-- **dtype safety:** Handles CloudBeds dtype inconsistencies (string reservation numbers, etc.) without crashing
-- **Fiscal guardrail:** Exchange rate values are never misidentified as ARS amounts
+Key invariants validated:
+- **Anti-crossmatch:** guests with different names but matching amounts are never incorrectly linked.
+- **dtype safety:** handles Cloudbeds dtype inconsistencies (string reservation numbers, etc.) without crashing.
+- **Fiscal guardrail:** exchange-rate values are never misread as ARS amounts.
 
 ---
 
 ## 📁 Sample Files
 
-The [`samples/`](samples/) folder contains fictional data illustrating exactly what goes in and out of the system:
+The [`samples/`](samples/) folder contains **fictional** data illustrating exactly what goes in and out of the system:
 
 | File | Description |
 |---|---|
 | `input_cloudbeds_mock.xlsx` | Simulated PMS export (payments, reservations, rooms) |
 | `input_sifactura_mock.xlsx` | Simulated fiscal invoice list (AFIP/SiFactura) |
-| `output_auditoria_mock.xlsx` | Final report generated by AUDIBOT, color-coded |
+| `output_auditoria_mock.xlsx` | Final color-coded report generated by AUDIBOT |
 
-The output includes examples of every scenario the algorithm handles: exact matches, payments split across multiple transactions, USD→ARS conversion via GREEN_CARD, LIFO voids, and discrepancies pending review.
+The output includes every scenario the algorithm handles: exact matches, split payments, USD→ARS conversion, LIFO voids, and discrepancies pending review.
 
 ---
 

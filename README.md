@@ -1,12 +1,12 @@
 # 🏨 AUDIBOT — Hotel Financial Audit ETL: Cloudbeds ↔ SiFactura
 
-![Tests](https://img.shields.io/badge/tests-455%20passed-brightgreen) ![Python](https://img.shields.io/badge/python-3.12%2B-blue) ![Version](https://img.shields.io/badge/version-4.10-blue) ![Coverage](https://img.shields.io/badge/coverage-core%20engine-brightgreen)
+![Tests](https://img.shields.io/badge/tests-1025%20passed-brightgreen) ![Python](https://img.shields.io/badge/python-3.12%2B-blue) ![Version](https://img.shields.io/badge/version-4.10.63-blue) ![Releases](https://img.shields.io/badge/releases-41-blue) ![Coverage](https://img.shields.io/badge/coverage-core%20engine-brightgreen)
 
 A data-processing and automatic reconciliation engine that solves the most critical bottleneck in night auditing: cross-referencing hundreds of daily transactions between a PMS (**Cloudbeds**) and a fiscal billing system (**SiFactura/AFIP**), while eliminating human error.
 
-> **In production at Up Hoteles (Buenos Aires)** — running nightly across three properties, used by real auditors.
+> **In production at a Buenos Aires hotel chain (11 properties)**, rolled out site by site since 2026 and used by night auditors on real fiscal data. Licensed to the client under a signed agreement that formally acknowledges authorship.
 
-> **Commercial Impact:** transforms a manual 45+ minute error-prone task into a flawless process that runs in **~0.40 seconds** on average.
+> **Impact:** replaces the manual reconciliation of each night audit. A full day of transactions is processed in **under a second**; the auditor only reads the rows that need action.
 
 ---
 
@@ -27,11 +27,12 @@ A Python desktop app that ingests the raw reports, normalizes the data, and appl
 
 ---
 
-## 🆕 What's new since the first pilot (v4.10)
+## 🆕 What's new since the first pilot (v4.10.x, 41 public releases)
 
-The engine grew from 84 to **455 automated tests** and matured from a matching script into a maintained desktop product:
+The engine grew from 84 to **1,025 automated tests** and matured from a matching script into a maintained desktop product:
 
-- **5 new automatic detections** (see below) surfaced from real production audits.
+- **New automatic detections** (see below), every one of them surfaced from a real production audit and shipped with its regression case.
+- **Regression suite on anonymized real cases** plus a **golden master** of the engine's output, run as a gate before each release: a change that moves a single cell of any historical report is caught before it ships.
 - **Built-in auto-update** — the app checks for new public releases and updates itself, so every property runs the same current version.
 - **Irreversible data anonymization** for support bundles (GDPR / EDPB-aligned) — see *Data Handling* below.
 - **Integrated support flow** — one-click support package delivered to the developer, with graceful offline degradation.
@@ -53,7 +54,12 @@ The algorithm doesn't do a naive "equal amounts" match. It encodes the real **bu
 - 🆕 **Orphan FT/FX invoices of the same guest** — catches a foreign-platform charge invoiced as if it were domestic.
 - 🆕 **Fiscal invoices with no matching Cloudbeds payment** — every invoice in range must have a counterpart.
 - 🆕 **Mercado Pago imputed to the wrong point of sale** — separates the false positive from the real POS problem.
-- 🆕 **USD × exchange-rate ≠ ARS coherence** — a peso invoice that doesn't close against a dollar payment at the day's rate.
+- 🆕 **USD × exchange-rate ≠ ARS coherence** — a peso invoice that doesn't close against a dollar payment at the day's rate; when the note's amount is corrupt, the invoice is recovered through the reservation instead of being lost.
+- 🆕 **Refunds and voids paired with their credit notes** — including the "void and re-post" procedure, which used to be punished as an error.
+- 🆕 **Incomplete re-invoicing** — an orphan invoice whose amount was absorbed into another one.
+- 🆕 **Payment method contradicted by the note** — the row says card, the note says cash.
+- 🆕 **Note amount cross-checked against the USD amount** at the declared exchange rate, so the order in which the receptionist writes the note no longer matters.
+- 🆕 **Current-account charges matched to their invoice** when it already exists, instead of being set aside for month-end billing.
 
 ---
 
@@ -94,12 +100,12 @@ Modular, testable, and built to add new billing logic or properties by editing c
 
 ## ✅ Test Suite
 
-**455 passing tests** cover the matching engine end-to-end:
+**1,025 passing tests** cover the matching engine end-to-end, plus a regression catalogue of anonymized real support bundles and a golden master of the engine's output:
 
 - The matching core (`core/matchers/`): duplicate detection, anti-crossmatch, business exclusions (Mercado Pago, voids).
 - Parsers: ARS extraction across multiple note formats, fiscal guardrail, payment-method mapping.
 - Utilities: name normalization, fuzzy similarity, exchange-rate math, amount parsing.
-- The five new detectors, each with its own regression scenarios.
+- Every detector, each with its own regression scenarios taken from the production case that motivated it.
 
 Key invariants validated:
 - **Anti-crossmatch:** guests with different names but matching amounts are never incorrectly linked.
@@ -126,5 +132,5 @@ The output includes every scenario the algorithm handles: exact matches, split p
 
 Do you have an operational workflow you want to automate? I can develop a similar solution for your business.
 
-*   **LinkedIn:** [Sebastián González](https://www.linkedin.com/in/sebasti%C3%A1n-gonz%C3%A1lez-571a18195/)
+*   **LinkedIn:** [Sebastián González](https://www.linkedin.com/in/sebastian-gonzalez-it)
 *   **Email:** [sebag2298@gmail.com](mailto:sebag2298@gmail.com)
